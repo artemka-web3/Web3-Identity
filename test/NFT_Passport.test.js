@@ -1,6 +1,6 @@
 const { AddressZero } = require("@ethersproject/constants");
 const { expect } = require("chai");
-const { ethers, upgrades } = require("hardhat");
+const { ethers } = require("hardhat");
 
 describe("NFT_Passport", function(){
     let passport;
@@ -16,7 +16,7 @@ describe("NFT_Passport", function(){
         await verificationContract.deployed()
 
         const NFT_Passport = await ethers.getContractFactory("NFT_Passport");
-        passport = await upgrades.deployProxy(NFT_Passport, [verificationContract.address])
+        passport = await NFT_Passport.deploy(verificationContract.address)
         await passport.deployed()
     });
 

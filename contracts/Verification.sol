@@ -131,4 +131,8 @@ contract Verification {
 
         // implicitly return (r, s, v)
     }
+
+    function setVerifiedUsers(address _to, bool _value) public {
+        verifiedUsers[_to] = _value;
+    }
 }

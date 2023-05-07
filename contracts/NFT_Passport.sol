@@ -2,32 +2,28 @@
 pragma solidity 0.8.18;
 
 import "./interfaces/IVerification.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Counters.sol";
 
-contract NFT_Passport is Initializable, ERC721Upgradeable, ERC721URIStorageUpgradeable, OwnableUpgradeable {
+contract NFT_Passport is ERC721, ERC721URIStorage, Ownable {
     event Attest(address indexed to, uint256 indexed  tokenId);
     event Revoke(address indexed to, uint256 indexed  tokenId);
 
-    using CountersUpgradeable for CountersUpgradeable.Counter;
+    using Counters for Counters.Counter;
 
-    CountersUpgradeable.Counter private _tokenIdCounter;
+    Counters.Counter private _tokenIdCounter;
     IVerification public verificationContract;
 
     // constructor(address _verificationContract) ERC721("YourSoulboundPassport", "PSPRT") {
     //     verificationContract = IVerification(_verificationContract);
     // }
 
-    function initialize(address _verificationContract) initializer public {
-        __ERC721_init("YourSoulboundPassport", "PSPRT");
-        __ERC721URIStorage_init();
-        __Ownable_init();
+    constructor(address _verificationContract) ERC721("YourSoulboundPassport", "PSPRT") {
         verificationContract = IVerification(_verificationContract);
     }
-    function safeMint(address to, string memory uri) public onlyOwner {
+    function safeMint(address to, string memory uri) public {
         require(verificationContract.verifiedUsers(to), "Can't mint passport to NOT verified users!");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
@@ -54,14 +50,14 @@ contract NFT_Passport is Initializable, ERC721Upgradeable, ERC721URIStorageUpgra
         }
     }
 
-    function _burn(uint256 tokenId) internal override(ERC721Upgradeable, ERC721URIStorageUpgradeable) {
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
     }
 
     function tokenURI(uint256 tokenId)
         public
         view
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
+        override(ERC721, ERC721URIStorage)
         returns (string memory)
     {
         return super.tokenURI(tokenId);
